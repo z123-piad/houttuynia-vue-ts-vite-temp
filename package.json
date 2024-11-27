@@ -9,12 +9,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "D": "^1.0.0",
+    "unplugin-auto-import": "^0.18.5",
+    "unplugin-vue-components": "^0.27.4",
     "vue": "^3.5.13"
   },
   "devDependencies": {
+    "@types/node": "^22.10.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "typescript": "~5.6.2",
     "vite": "^6.0.1",
     "vue-tsc": "^2.1.10"
-  }
+  },
+  "engines": {
+    "node": ">=22.11.0"
+  },
+  "author": "ban_sheng",
+  "repository": "https://github.com/z123-piad/houttuynia-vue-ts-vite-temp.git"
 }

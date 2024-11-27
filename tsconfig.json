@@ -1,7 +1,13 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "compilerOptions": {
+    // 解析非相对模块的基地址，默认是当前目录
+    "baseUrl": "./",
+    //路径映射，相对于baseUrl
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    // 允许默认导入
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["src/**/*.d.ts"]
 }
