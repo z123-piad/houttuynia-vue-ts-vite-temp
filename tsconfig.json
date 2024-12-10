@@ -1,13 +1,32 @@
 {
   "compilerOptions": {
+    "target": "ES6",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
     // 解析非相对模块的基地址，默认是当前目录
-    "baseUrl": "./",
+    "baseUrl": ".",
     //路径映射，相对于baseUrl
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
     // 允许默认导入
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "types": ["vite-plugin-svg-icons/client"]
   },
-  "include": ["src/**/*.d.ts"]
+  "include": ["src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
 }

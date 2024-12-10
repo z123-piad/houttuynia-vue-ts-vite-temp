@@ -76,6 +76,18 @@ Components({
 
 ## 整合 SVG 图标
 
+### 整合 `Iconfont` 第三方图标库
+
+[vite-plugin-svg-icons 官方文档]: (https://github.com/vbenjs/vite-plugin-svg-icons/blob/main/README.zh_CN.md)
+
+
+
+
+
+
+
+### 阿里矢量图库
+
 
 
 

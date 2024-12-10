@@ -3,6 +3,8 @@ import vue from "@vitejs/plugin-vue";
 import path from 'path';
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
+import UnoCSS from 'unocss/vite';
 import {
   name,
   version,
@@ -48,9 +50,52 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       dts: path.resolve(rootDirectory, "types", "auto-imports.d.ts"),
     }),
     Components({
-      dts: path.resolve(rootDirectory, "types", "components.d.ts"), // 指定自动导入组件TS类型声明文件路径
+      // 指定自动导入组件TS类型声明文件路径
+      dts: path.resolve(rootDirectory, "types", "components.d.ts"),
     }),
-  ]
+    createSvgIconsPlugin({
+      // 指定需要缓存的图标文件夹
+      iconDirs: [path.resolve(process.cwd(), 'src/icons')],
+      // 指定symbolId格式
+      symbolId: 'icon-[dir]-[name]',
+      /**
+       * 自定义插入位置
+       * @default: body-last
+       */
+      inject: 'body-first'
+
+      /**
+       * custom dom id
+       * @default: __svg__icons__dom__
+       */
+      // customDomId: '__svg__icons__dom__',
+    }),
+    UnoCSS({})
+  ];
+  const css = {
+    // CSS 预处理器
+    preprocessorOptions: {
+      //define global scss variable
+      scss: {
+        javascriptEnabled: true,
+        additionalData: `@use "@/styles/variables.scss" as *;`
+      }
+    }
+  };
+  const server = {
+    host: '0.0.0.0',
+    port: Number(env.VITE_APP_PORT),
+    // 自动打开浏览器
+    open: true,
+    proxy: {
+      [env.VITE_APP_BASE_API]: {
+        target: env.VITE_APP_TARGET,
+        changeOrigin: true,
+        rewrite: path =>
+          path.replace(new RegExp('^' + env.VITE_APP_BASE_API), '')
+      }
+    }
+  };
   console.log({ 'APP_INFO: ': __APP_INFO__, mode });
   return {
     resolve: {
@@ -58,6 +103,8 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         "@": rootDirectory,
       }
     },
-    plugins
+    plugins,
+    css,
+    server
   }
 })
