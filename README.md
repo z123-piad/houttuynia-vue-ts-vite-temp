@@ -1,133 +1,106 @@
-# houttuynia-vue-ts-vite-temp
+# Houttuynia Vue3 + Vite + TypeScript 脚手架
 
-# 项目描述
+面向三类场景的可维护前端脚手架：
 
-https://juejin.cn/post/7228990409909108793?searchId=202411271559399A30DF14E76A1E6B00B8
+1. **大屏 / 数据可视化**（`useScreenScale` / `useRemAdapter`，示例 `/screen`）
+2. **Cesium / Three.js**（env 启停；CDN 或 `public/vendor` 加载，**不强制 npm**）
+3. **管理后台**（路由 + 布局插槽 + Axios 封装，示例 `/admin`）
 
-* ## 技术栈
+## 技术栈
 
-  | 技术       | 描述                                         |      |
-  | ---------- | -------------------------------------------- | ---- |
-  | Vue3       | 渐进式 JavaScript 框架                       |      |
-  | Vite       | 前端开发与构建工具                           |      |
-  | TypeScript | 微软新推出的一种语言，是 JavaScript 的超集   |      |
-  | Pinia      | 新一代状态管理工具                           |      |
-  | Vue Router | Vue.js 的官方路由                            |      |
-  | VueUse     | 基于Vue组合式API的实用工具集(类比HuTool工具) |      |
-  | vue-i18n   | Vue 国际化多语言插件                         |      |
-  | Echarts    | 一个基于 JavaScript 的开源可视化图表库       |      |
-  |            |                                              |      |
+| 技术 | 说明 |
+| --- | --- |
+| Vue 3 | 组合式 API |
+| Vite 6 | 开发与构建 |
+| TypeScript | 类型约束 |
+| Vue Router | 路由 |
+| Pinia | 状态管理 |
+| Axios | HTTP（实例 + 拦截器 + typed helpers） |
+| UnoCSS + SCSS | 原子化 + 预处理器 |
+| ESLint + Prettier | 规范与格式化 |
 
-  
+## 环境要求
 
-* ## **运行环境**
+- Node.js ≥ 22.11.0
+- 推荐 VS Code + [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
 
-  |                  | 名称           | 备注 |
-  | ---------------- | -------------- | ---- |
-  | 开发工具         | VSCode         |      |
-  | 运行环境         | Node v22.11.0  |      |
-  | VSCode插件(必装) | Vue - Official |      |
-  |                  |                |      |
-  |                  |                |      |
+## 快速开始
 
-
-
-
-
-# Vite 配置
-
-## src 路径别名配置
-
-> 相对路径别名配置，使用 @ 代替 src
-
-> 如果添加后不起作用，检查 `tsconfig.json` 文件
-
-
-
-## unplugin 自动导入
-
-安装插件 unplugin-auto-import unplugin-vue-components
-
-```ts
-// vite.config.ts
-import AutoImport from "unplugin-auto-import/vite";
-import Components from "unplugin-vue-components/vite";
-
-AutoImport({
-  // 自动导入 Vue 相关函数，如：ref, reactive, toRef 等
-  imports: ["vue"],
-  eslintrc: {
-    // 是否自动生成 eslint 规则，建议生成之后设置 false
-    enabled: true,
-    // 指定自动导入函数 eslint 规则的文件
-    filepath: "./.eslintrc-auto-import.json",
-  },
-  // 指定自动导入函数TS类型声明文件路径
-  dts: path.resolve(rootDirectory, "types", "auto-imports.d.ts"),
-}),
-Components({
-  dts: path.resolve(rootDirectory, "types", "components.d.ts"), // 指定自动导入组件TS类型声明文件路径
-}),
+```bash
+npm install
+npm run dev
 ```
 
+开发服务器默认端口 **19001**（`env/.env.development` → `VITE_APP_PORT`）。
 
+```bash
+npm run build
+npm run preview
+npm run typecheck
+npm run lint
+npm run format
+```
 
+## 示例路由
 
+| 路径 | 说明 |
+| --- | --- |
+| `/` | 首页 |
+| `/screen` | 大屏缩放与面板模式示例 |
+| `/scene` | 三维扩展总览（显示当前 env） |
+| `/scene/cesium` | Cesium 轻量演示（需启用） |
+| `/scene/three` | Three.js 轻量演示（需启用） |
+| `/admin/dashboard` | 后台控制台 + Axios/mock 列表示例 |
+| `/admin/users` | 后台表单 + typed POST 示例 |
 
-## 整合 SVG 图标
+## Cesium / Three 配置旋钮
 
-### 整合 `Iconfont` 第三方图标库
+详见 [docs/extensions.md](./docs/extensions.md)。摘要：
 
-[vite-plugin-svg-icons 官方文档]: (https://github.com/vbenjs/vite-plugin-svg-icons/blob/main/README.zh_CN.md)
+| 变量 | 作用 |
+| --- | --- |
+| `VITE_CESIUM_ENABLED` / `VITE_THREE_ENABLED` | 启停 |
+| `VITE_CESIUM_LOAD_MODE` / `VITE_THREE_LOAD_MODE` | `remote` \| `local` |
+| `VITE_CESIUM_BASE_URL` / `VITE_THREE_BASE_URL` | CDN 或 `/vendor/.../` |
 
+开发环境默认 **remote + 启用**（走 jsDelivr，无需 `npm i`）。生产默认关闭。本地静态资源说明见 `public/vendor/*/README.md`。
 
+## Axios
 
+- 封装：`src/utils/request.ts`
+- 类型：`src/types/http.ts`
+- 用法：`get` / `post` / `put` / `del`，自动解包业务 `data`
 
+## 目录结构
 
+```
+env/                 # 环境变量（Vite envDir）
+docs/                # 扩展指南
+public/vendor/       # local 模式引擎静态资源（可选）
+src/
+  api/
+  config/engine.ts   # Cesium/Three 配置读取
+  composables/
+  extensions/
+  layouts/
+  router/
+  stores/
+  utils/request.ts
+  views/
+```
 
+路径别名：`@` → `src/`。
 
-### 阿里矢量图库
+## 环境变量（应用）
 
+| 变量 | 说明 |
+| --- | --- |
+| `VITE_APP_TITLE` | 文档标题前缀 |
+| `VITE_APP_PORT` | 开发端口（默认 19001） |
+| `VITE_APP_BASE_API` | Axios `baseURL` / 代理前缀 |
+| `VITE_APP_TARGET` | 开发代理目标 |
 
+## 扩展阅读
 
-
-
-## 整合 SCSS
-
-
-
-## 整合 UnoCSS
-
-
-
-## 整合 Pinia
-
-
-
-## 环境变量
-
-
-
-## 反向代理解决跨域
-
-
-
-## 整合 Axios
-
-
-
-## vue-router 动态路由
-
-
-
-## 按钮权限
-
-
-
-
-
-## 组件封装
-
-
-
-## 规范配置
+- [扩展指南](./docs/extensions.md)
+- [开发常见问题](./FAQ.md)

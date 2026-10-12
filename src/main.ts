@@ -1,10 +1,14 @@
-import { createApp } from 'vue'
-/** 重置样式 这里引入自定义的重置样式也可 */
-import '@unocss/reset/tailwind.css';
-import './style.css';
-import 'virtual:svg-icons-register';
-import App from './App.vue';
-import 'uno.css';
+import { createApp } from "vue";
 import { createPinia } from "pinia";
+import "@unocss/reset/tailwind.css";
+import "virtual:svg-icons-register";
+import "virtual:uno.css";
+import "@/styles/index.scss";
+import App from "./App.vue";
+import { router } from "./router";
 
-createApp(App).use(createPinia()).mount('#app')
+const app = createApp(App);
+
+app.use(createPinia());
+app.use(router);
+app.mount("#app");

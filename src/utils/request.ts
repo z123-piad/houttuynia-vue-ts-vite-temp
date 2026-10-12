@@ -1,62 +1,130 @@
-import { HMessageType } from './../hel/index';
-//  src/utils/request.ts
-import axios, { InternalAxiosRequestConfig, AxiosResponse } from 'axios';
-import { HMessage } from '../hel';
+import axios, {
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from "axios";
+import {
+  DEFAULT_SUCCESS_CODES,
+  type ApiResponse,
+  type ApiSuccessCode,
+} from "@/types/http";
+import { notify } from "./message";
 
-let base_api: string = import.meta.env.VITE_BASE_API;
-// 创建 axios 实例
-const service = axios.create({
-  baseURL: base_api,
-  timeout: 50000,
-  headers: { 'Content-Type': 'application/json;charset=utf-8' }
+export interface RequestOptions {
+  /** 跳过业务 code 校验，直接返回 AxiosResponse.data 原始值 */
+  raw?: boolean;
+  /** 成功业务码；默认 DEFAULT_SUCCESS_CODES */
+  successCodes?: ApiSuccessCode[];
+  /** 关闭错误 toast（仍 reject） */
+  silent?: boolean;
+}
+
+type RequestConfig = AxiosRequestConfig & { requestOptions?: RequestOptions };
+
+function isApiResponse(payload: unknown): payload is ApiResponse {
+  return (
+    !!payload &&
+    typeof payload === "object" &&
+    "code" in (payload as Record<string, unknown>)
+  );
+}
+
+function unwrap<T>(payload: unknown, options: RequestOptions = {}): T {
+  if (options.raw || !isApiResponse(payload)) {
+    return payload as T;
+  }
+
+  const codes = options.successCodes ?? DEFAULT_SUCCESS_CODES;
+  const { code, msg, message, data } = payload;
+  if (codes.includes(code)) {
+    return data as T;
+  }
+
+  const text = msg || message || "系统出错";
+  if (!options.silent) notify("error", text);
+  throw new Error(text);
+}
+
+const service: AxiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_APP_BASE_API,
+  timeout: 50_000,
+  headers: { "Content-Type": "application/json;charset=utf-8" },
 });
 
-// 请求拦截器
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // const userStore = useUserStoreHook();
-    // if (userStore.token) {
-    //   config.headers.Authorization = userStore.token;
-    // }
+    // 在此挂载 token：config.headers.Authorization = `Bearer ${token}`
     return config;
   },
-  (error: any) => {
-    return Promise.reject(error);
-  }
+  (error: unknown) => Promise.reject(error),
 );
 
-// 响应拦截器
 service.interceptors.response.use(
-  (response: AxiosResponse) => {
-    const { code, msg } = response.data;
-    // 登录成功
-    if (code === '00000') {
-      return response.data;
+  (response: AxiosResponse) => response,
+  (error: unknown) => {
+    const err = error as {
+      config?: RequestConfig;
+      response?: { data?: { msg?: string; message?: string } };
+      message?: string;
+    };
+    const silent = err.config?.requestOptions?.silent;
+    if (!silent) {
+      notify(
+        "error",
+        err.response?.data?.msg ||
+          err.response?.data?.message ||
+          err.message ||
+          "网络异常",
+      );
     }
-
-    HMessage(HMessageType.ERROR, msg || '系统出错');
-    return Promise.reject(new Error(msg || 'Error'));
+    return Promise.reject(error);
   },
-  (error: any) => {
-    if (error.response.data) {
-      const { code, msg } = error.response.data;
-      // token 过期，跳转登录页
-      if (code === 'A0230') {
-        // ElMessageBox.confirm('当前页面已失效，请重新登录', '提示', {
-        //   confirmButtonText: '确定',
-        //   type: 'warning'
-        // }).then(() => {
-        //   localStorage.clear(); // @vueuse/core 自动导入
-        //   window.location.href = '/';
-        // });
-      }else{
-          HMessage(HMessageType.ERROR, (msg || '系统出错'));
-      }
-    }
-    return Promise.reject(error.message);
-  }
 );
 
-// 导出 axios 实例
-export default service;
+async function request<T = unknown>(config: RequestConfig): Promise<T> {
+  const { requestOptions, ...axiosConfig } = config;
+  // 显式挂到 config，确保错误拦截器也能读到 silent 等选项
+  const response = await service.request<unknown>({
+    ...axiosConfig,
+    requestOptions,
+  } as RequestConfig);
+  return unwrap<T>(response.data, requestOptions);
+}
 
+export function get<T = unknown>(
+  url: string,
+  config?: RequestConfig,
+): Promise<T> {
+  return request<T>({ ...config, url, method: "GET" });
+}
+
+export function post<T = unknown>(
+  url: string,
+  data?: unknown,
+  config?: RequestConfig,
+): Promise<T> {
+  return request<T>({ ...config, url, method: "POST", data });
+}
+
+export function put<T = unknown>(
+  url: string,
+  data?: unknown,
+  config?: RequestConfig,
+): Promise<T> {
+  return request<T>({ ...config, url, method: "PUT", data });
+}
+
+export function del<T = unknown>(
+  url: string,
+  config?: RequestConfig,
+): Promise<T> {
+  return request<T>({ ...config, url, method: "DELETE" });
+}
+
+/** 需要完整 AxiosResponse 时使用（少见） */
+export function getHttpClient(): AxiosInstance {
+  return service;
+}
+
+export default service;
