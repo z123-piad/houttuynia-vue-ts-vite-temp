@@ -1,62 +1,45 @@
-import { HMessageType } from './../hel/index';
-//  src/utils/request.ts
-import axios, { InternalAxiosRequestConfig, AxiosResponse } from 'axios';
-import { HMessage } from '../hel';
+import axios, {
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from "axios";
+import { notify } from "./message";
 
-let base_api: string = import.meta.env.VITE_BASE_API;
-// 创建 axios 实例
 const service = axios.create({
-  baseURL: base_api,
-  timeout: 50000,
-  headers: { 'Content-Type': 'application/json;charset=utf-8' }
+  baseURL: import.meta.env.VITE_APP_BASE_API,
+  timeout: 50_000,
+  headers: { "Content-Type": "application/json;charset=utf-8" },
 });
 
-// 请求拦截器
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // const userStore = useUserStoreHook();
-    // if (userStore.token) {
-    //   config.headers.Authorization = userStore.token;
-    // }
+    // 在此挂载 token 等：config.headers.Authorization = `Bearer ${token}`
     return config;
   },
-  (error: any) => {
-    return Promise.reject(error);
-  }
+  (error: unknown) => Promise.reject(error),
 );
 
-// 响应拦截器
 service.interceptors.response.use(
   (response: AxiosResponse) => {
-    const { code, msg } = response.data;
-    // 登录成功
-    if (code === '00000') {
-      return response.data;
-    }
-
-    HMessage(HMessageType.ERROR, msg || '系统出错');
-    return Promise.reject(new Error(msg || 'Error'));
-  },
-  (error: any) => {
-    if (error.response.data) {
-      const { code, msg } = error.response.data;
-      // token 过期，跳转登录页
-      if (code === 'A0230') {
-        // ElMessageBox.confirm('当前页面已失效，请重新登录', '提示', {
-        //   confirmButtonText: '确定',
-        //   type: 'warning'
-        // }).then(() => {
-        //   localStorage.clear(); // @vueuse/core 自动导入
-        //   window.location.href = '/';
-        // });
-      }else{
-          HMessage(HMessageType.ERROR, (msg || '系统出错'));
+    const payload = response.data;
+    // 按后端约定调整：此处假定 { code, msg, data }
+    if (payload && typeof payload === "object" && "code" in payload) {
+      const { code, msg } = payload as { code: string | number; msg?: string };
+      if (code === "00000" || code === 0 || code === 200) {
+        return payload;
       }
+      notify("error", msg || "系统出错");
+      return Promise.reject(new Error(msg || "Error"));
     }
-    return Promise.reject(error.message);
-  }
+    return payload;
+  },
+  (error: unknown) => {
+    const err = error as {
+      response?: { data?: { msg?: string } };
+      message?: string;
+    };
+    notify("error", err.response?.data?.msg || err.message || "网络异常");
+    return Promise.reject(error);
+  },
 );
 
-// 导出 axios 实例
 export default service;
-
