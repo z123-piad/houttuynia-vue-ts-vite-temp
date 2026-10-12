@@ -17,6 +17,20 @@ interface ImportMetaEnv {
   readonly VITE_APP_PORT: string;
   readonly VITE_APP_BASE_API: string;
   readonly VITE_APP_TARGET: string;
+
+  /** Cesium：true/false */
+  readonly VITE_CESIUM_ENABLED: string;
+  /** remote | local */
+  readonly VITE_CESIUM_LOAD_MODE: string;
+  /** CDN 或 /vendor/cesium/ ，需以 / 结尾 */
+  readonly VITE_CESIUM_BASE_URL: string;
+
+  /** Three：true/false */
+  readonly VITE_THREE_ENABLED: string;
+  /** remote | local */
+  readonly VITE_THREE_LOAD_MODE: string;
+  /** CDN 或 /vendor/three/ ，需以 / 结尾 */
+  readonly VITE_THREE_BASE_URL: string;
 }
 
 interface ImportMeta {

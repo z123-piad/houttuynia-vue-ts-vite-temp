@@ -26,3 +26,9 @@ dist-ssr
 
 # Auto-generated (keep committed stubs if present)
 *.tsbuildinfo
+
+# Local 3D engine binaries (keep README only)
+public/vendor/cesium/**
+!public/vendor/cesium/README.md
+public/vendor/three/**
+!public/vendor/three/README.md

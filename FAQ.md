@@ -23,3 +23,14 @@
 ## 4. 代理不生效
 
 检查 `env/.env.development` 中 `VITE_APP_BASE_API` 与 `VITE_APP_TARGET`，请求需走该前缀（与 `src/utils/request.ts` 的 `baseURL` 一致）。
+
+## 5. Cesium / Three 页面空白或报错
+
+1. 确认对应 `VITE_*_ENABLED=true`
+2. `remote` 模式需能访问 CDN（检查 `VITE_*_BASE_URL`）
+3. `local` 模式确认 `public/vendor/...` 已放入 `Cesium.js` 或 `three.module.js`
+4. 修改 env 后必须重启 `npm run dev`
+
+## 6. 开发端口不是 19001
+
+以 `env/.env.development` 的 `VITE_APP_PORT` 为准；未配置时 Vite 回退到 `19001`。

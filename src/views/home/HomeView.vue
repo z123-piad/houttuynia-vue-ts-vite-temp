@@ -14,8 +14,9 @@ import SvgIcon from "@/components/SvgIcon/index.vue";
       </p>
       <div class="actions">
         <RouterLink class="btn btn--primary" to="/screen">大屏示例</RouterLink>
-        <RouterLink class="btn" to="/scene">三维扩展点</RouterLink>
-        <RouterLink class="btn" to="/admin">管理后台布局</RouterLink>
+        <RouterLink class="btn" to="/scene/cesium">Cesium</RouterLink>
+        <RouterLink class="btn" to="/scene/three">Three.js</RouterLink>
+        <RouterLink class="btn" to="/admin">管理后台</RouterLink>
       </div>
     </header>
 
@@ -23,12 +24,14 @@ import SvgIcon from "@/components/SvgIcon/index.vue";
       <article>
         <SvgIcon icon-class="hxsm" size="28px" color="currentColor" />
         <h2>大屏</h2>
-        <p>内置 rem / transform 缩放工具，按设计稿尺寸适配。</p>
+        <p>内置 rem / transform 缩放工具，路由 <code>/screen</code>。</p>
       </article>
       <article>
         <SvgIcon icon-class="bbt" size="28px" color="currentColor" />
         <h2>GIS / 3D</h2>
-        <p>Cesium、Three.js 作为可选依赖，文档说明接入方式。</p>
+        <p>
+          经 env 启停，从 CDN 或 <code>public/vendor</code> 加载，无需强制 npm。
+        </p>
       </article>
       <article>
         <SvgIcon
@@ -37,7 +40,7 @@ import SvgIcon from "@/components/SvgIcon/index.vue";
           color="currentColor"
         />
         <h2>后台</h2>
-        <p>路由 + 布局插槽 + 环境变量，够用但不臃肿。</p>
+        <p>布局插槽 + Axios typed helpers，示例 <code>/admin</code>。</p>
       </article>
     </section>
   </div>

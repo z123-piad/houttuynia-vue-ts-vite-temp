@@ -1,33 +1,36 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
+import { engineConfig } from "@/config/engine";
 </script>
 
 <template>
   <div class="scene-hub">
     <RouterLink class="back" to="/">← 返回首页</RouterLink>
-    <h1>Cesium / Three.js 扩展点</h1>
+    <h1>Cesium / Three.js 扩展</h1>
     <p>
-      脚手架默认<strong>不安装</strong> Cesium 与
-      Three.js，以免拖慢无关项目。请按需安装，并参考仓库内
-      <code>docs/extensions.md</code> 与
-      <code>src/extensions/</code> 下的接入示例。
+      引擎通过环境变量启停，并从 <strong>remote CDN</strong> 或
+      <strong>local 静态目录</strong> 加载，<strong>默认不 npm 安装</strong>
+      重型包。详见 <code>docs/extensions.md</code>。
     </p>
 
     <div class="grid">
       <section>
         <h2>Cesium</h2>
-        <pre><code>npm i cesium vite-plugin-cesium</code></pre>
         <p>
-          入口占位：<code>src/extensions/cesium/useCesiumViewer.ts</code>（安装依赖后取消注释即可）。
+          状态：{{ engineConfig.cesium.enabled ? "启用" : "关闭" }} ·
+          {{ engineConfig.cesium.loadMode }}
         </p>
+        <pre><code>{{ engineConfig.cesium.baseUrl }}</code></pre>
+        <RouterLink class="btn" to="/scene/cesium">打开示例</RouterLink>
       </section>
       <section>
         <h2>Three.js</h2>
-        <pre><code>npm i three
-npm i -D @types/three</code></pre>
         <p>
-          入口占位：<code>src/extensions/three/useThreeScene.ts</code>（安装依赖后取消注释即可）。
+          状态：{{ engineConfig.three.enabled ? "启用" : "关闭" }} ·
+          {{ engineConfig.three.loadMode }}
         </p>
+        <pre><code>{{ engineConfig.three.baseUrl }}</code></pre>
+        <RouterLink class="btn" to="/scene/three">打开示例</RouterLink>
       </section>
     </div>
   </div>
@@ -82,12 +85,22 @@ p {
     background: #0f172a;
     color: #e2e8f0;
     overflow: auto;
-    font-size: 13px;
+    font-size: 12px;
   }
 
   code {
     font-family:
       ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
+}
+
+.btn {
+  display: inline-flex;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: $brand;
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
 }
 </style>

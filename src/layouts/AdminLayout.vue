@@ -24,6 +24,7 @@ const route = useRoute();
         <slot name="aside">
           <nav class="nav">
             <RouterLink to="/admin/dashboard">控制台</RouterLink>
+            <RouterLink to="/admin/users">用户示例</RouterLink>
             <RouterLink to="/screen">大屏示例</RouterLink>
             <RouterLink to="/scene">三维扩展</RouterLink>
             <RouterLink to="/">返回首页</RouterLink>

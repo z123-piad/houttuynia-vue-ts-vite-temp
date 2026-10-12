@@ -1,14 +1,21 @@
 # API 模块
 
-按业务域拆分请求，例如：
+基于 `@/utils/request` 的 typed helpers（`get` / `post` / `put` / `del`）。
 
 ```ts
-// src/api/user.ts
-import request from "@/utils/request";
+import { get } from "@/utils/request";
+
+export interface Profile {
+  id: string;
+  name: string;
+}
 
 export function fetchProfile() {
-  return request.get("/user/profile");
+  return get<Profile>("/user/profile");
 }
 ```
 
-环境变量 `VITE_APP_BASE_API` 作为 axios `baseURL`，开发环境由 Vite 代理到 `VITE_APP_TARGET`。
+约定：后端返回 `{ code, msg, data }` 时，helpers 会在成功码下直接解析出 `data`。
+原始响应可传 `{ requestOptions: { raw: true } }`。
+
+环境变量 `VITE_APP_BASE_API` 作为 axios `baseURL`，开发代理目标为 `VITE_APP_TARGET`。
