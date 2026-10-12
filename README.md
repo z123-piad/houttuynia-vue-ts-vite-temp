@@ -11,7 +11,7 @@
 | 技术 | 说明 |
 | --- | --- |
 | Vue 3 | 组合式 API |
-| Vite 6 | 开发与构建 |
+| Vite 8 | 开发与构建 |
 | TypeScript | 类型约束 |
 | Vue Router | 路由 |
 | Pinia | 状态管理 |
@@ -21,7 +21,7 @@
 
 ## 环境要求
 
-- Node.js ≥ 22.11.0
+- Node.js ≥ 22.18.0（Vite 8 + Vue Router 5 传递依赖要求）
 - 推荐 VS Code + [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
 
 ## 快速开始

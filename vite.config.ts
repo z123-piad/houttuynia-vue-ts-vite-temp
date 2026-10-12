@@ -1,29 +1,31 @@
 import { ConfigEnv, UserConfig, defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
-import path from "path";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
 import { createSvgIconsPlugin } from "vite-plugin-svg-icons";
 import UnoCSS from "unocss/vite";
-import {
-  name,
-  version,
-  engines,
-  dependencies,
-  devDependencies,
-} from "./package.json";
+import pkg from "./package.json" with { type: "json" };
 
 /** 构建时可注入的应用元信息 */
 const __APP_INFO__ = {
-  pkg: { name, version, engines, dependencies, devDependencies },
+  pkg: {
+    name: pkg.name,
+    version: pkg.version,
+    engines: pkg.engines,
+    dependencies: pkg.dependencies,
+    devDependencies: pkg.devDependencies,
+  },
   buildTimestamp: Date.now(),
 };
 
-const srcDir = path.resolve(__dirname, "src");
+const rootDir = path.dirname(fileURLToPath(import.meta.url));
+const srcDir = path.resolve(rootDir, "src");
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
-  const envDir = path.resolve(__dirname, "env");
+  const envDir = path.resolve(rootDir, "env");
   const env = loadEnv(mode, envDir);
 
   return {
