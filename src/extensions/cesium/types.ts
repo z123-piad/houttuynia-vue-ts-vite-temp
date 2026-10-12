@@ -6,12 +6,20 @@ export interface CesiumViewerLike {
   };
 }
 
+export interface CesiumImageryProviderLike {
+  // 标记接口，具体实现由 Cesium 运行时提供
+}
+
 export interface CesiumNamespace {
   Viewer: new (
     container: Element,
     options?: Record<string, unknown>,
   ) => CesiumViewerLike;
   Ion?: { defaultAccessToken?: string };
+  OpenStreetMapImageryProvider?: new (options?: {
+    url?: string;
+  }) => CesiumImageryProviderLike;
+  ImageryLayer?: new (provider: CesiumImageryProviderLike) => unknown;
 }
 
 declare global {

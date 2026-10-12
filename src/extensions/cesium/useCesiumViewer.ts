@@ -4,7 +4,7 @@ import { loadCesium } from "./loadCesium";
 import type { CesiumViewerLike } from "./types";
 
 export interface UseCesiumViewerOptions {
-  /** Ion token（可选；无 token 时示例仍可启动，影像可能受限） */
+  /** Ion token（可选）。未提供时使用 OSM 底图，避免默认 Ion 资源失败。 */
   ionToken?: string;
 }
 
@@ -34,7 +34,8 @@ export function useCesiumViewer(
       if (options.ionToken && Cesium.Ion) {
         Cesium.Ion.defaultAccessToken = options.ionToken;
       }
-      viewer.value = new Cesium.Viewer(container.value, {
+
+      const viewerOptions: Record<string, unknown> = {
         animation: false,
         timeline: false,
         baseLayerPicker: false,
@@ -43,7 +44,20 @@ export function useCesiumViewer(
         sceneModePicker: false,
         navigationHelpButton: false,
         fullscreenButton: false,
-      });
+      };
+
+      // 无 Ion token 时禁用默认 Ion 影像，改用 OSM，保证示例可离线于 Ion 运行
+      if (!options.ionToken && Cesium.OpenStreetMapImageryProvider) {
+        const osm = new Cesium.OpenStreetMapImageryProvider({
+          url: "https://tile.openstreetmap.org/",
+        });
+        viewerOptions.baseLayer = Cesium.ImageryLayer
+          ? new Cesium.ImageryLayer(osm)
+          : false;
+        viewerOptions.imageryProvider = osm;
+      }
+
+      viewer.value = new Cesium.Viewer(container.value, viewerOptions);
       status.value = "ready";
     } catch (error) {
       status.value = "error";

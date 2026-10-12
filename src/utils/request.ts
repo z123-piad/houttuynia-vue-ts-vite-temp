@@ -83,8 +83,13 @@ service.interceptors.response.use(
 );
 
 async function request<T = unknown>(config: RequestConfig): Promise<T> {
-  const response = await service.request<unknown>(config);
-  return unwrap<T>(response.data, config.requestOptions);
+  const { requestOptions, ...axiosConfig } = config;
+  // 显式挂到 config，确保错误拦截器也能读到 silent 等选项
+  const response = await service.request<unknown>({
+    ...axiosConfig,
+    requestOptions,
+  } as RequestConfig);
+  return unwrap<T>(response.data, requestOptions);
 }
 
 export function get<T = unknown>(
