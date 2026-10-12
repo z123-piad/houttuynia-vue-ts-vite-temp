@@ -6,9 +6,8 @@ export interface CesiumViewerLike {
   };
 }
 
-export interface CesiumImageryProviderLike {
-  // 标记接口，具体实现由 Cesium 运行时提供
-}
+/** 标记类型：具体实现由 Cesium 运行时提供 */
+export type CesiumImageryProviderLike = object;
 
 export interface CesiumNamespace {
   Viewer: new (
